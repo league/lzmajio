@@ -9,7 +9,8 @@ public class RoundTrip
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         LzmaOutputStream lo = new LzmaOutputStream( baos );
         PrintStream ps = new PrintStream( lo );
-        ps.println("Yes yes yes test test test.");
+        String k = "Yes yes yes test test test.";
+        ps.print( k );
         ps.close( );
         byte[] buf = baos.toByteArray();
 
@@ -22,6 +23,9 @@ public class RoundTrip
         ByteArrayInputStream bais = new ByteArrayInputStream( buf );
         LzmaInputStream li = new LzmaInputStream( bais );
         BufferedReader br = new BufferedReader(new InputStreamReader(li));
-        System.out.println(br.readLine());
+        String s = br.readLine();
+        System.out.println( s );
+        System.out.println( k );
+        assert s.equals( k );
     }
 }

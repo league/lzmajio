@@ -30,6 +30,7 @@ class EncoderThread extends Thread
             enc.SetDictionarySize( 1 << 18 );
             enc.WriteCoderProperties( out );
             enc.Code( in, out, -1, -1, null );
+            out.close( );
         }
         catch( IOException exn ) {
             this.exn = exn;

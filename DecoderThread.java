@@ -32,7 +32,7 @@ class DecoderThread extends Thread
             // check n == propSize
             dec.SetDecoderProperties( props );
             dec.Code( in, out, -1 );
-            out.close( );
+            in.close( );
         }
         catch( IOException exn ) {
             this.exn = exn;

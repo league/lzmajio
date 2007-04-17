@@ -14,7 +14,7 @@ class ConcurrentBufferOutputStream extends OutputStream
         this.q = q;
     }
 
-    public void write( int i ) throws IOException
+    protected void guarded_put( int i ) throws IOException
     {
         try {
             q.put( i );
@@ -24,9 +24,15 @@ class ConcurrentBufferOutputStream extends OutputStream
         }
     }
 
+    public void write( int i ) throws IOException
+    {
+        byte b = (byte)(i & 0xff);
+        guarded_put( b );
+    }
+
     public void close( ) throws IOException
     {
-        write( -1 );
+        guarded_put( -1 );
     }
 
 }

@@ -21,7 +21,8 @@ class ConcurrentBufferInputStream extends InputStream
         if( eof ) return -1;
         try {
             int i = q.take( );
-            eof = (i == -1);
+            if( i == -1 ) eof = true;
+            else i &= 0xFF;
             return i;
         }
         catch( InterruptedException exn ) {
