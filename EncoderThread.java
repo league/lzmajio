@@ -27,8 +27,9 @@ class EncoderThread extends Thread
     {
         try {
             enc.SetEndMarkerMode( true );
-            enc.SetDictionarySize( 1 << 18 );
-            enc.WriteCoderProperties( out );
+            enc.SetDictionarySize( 1 << 20 );
+            // enc.WriteCoderProperties( out );
+            // 5d 00 00 10 00
             enc.Code( in, out, -1, -1, null );
             out.close( );
         }

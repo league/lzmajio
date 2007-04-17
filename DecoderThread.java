@@ -23,13 +23,23 @@ class DecoderThread extends Thread
         this.exn = null;
     }
 
+    static final int propSize = 5;
+    static final byte[] props = new byte[propSize];
+
+    static {
+        // enc.SetEndMarkerMode( true );
+        // enc.SetDictionarySize( 1 << 20 );
+        props[0] = 0x5d;
+        props[1] = 0x00;
+        props[2] = 0x00;
+        props[3] = 0x10;
+        props[4] = 0x00;
+    }
+
     public void run( )
     { 
         try {
-            final int propSize = 5;
-            byte[] props = new byte[propSize];
-            int n = in.read( props, 0, propSize );
-            // check n == propSize
+            // int n = in.read( props, 0, propSize );
             dec.SetDecoderProperties( props );
             dec.Code( in, out, -1 );
             in.close( );

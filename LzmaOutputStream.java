@@ -75,6 +75,7 @@ public class LzmaOutputStream extends FilterOutputStream
         baos = new ByteArrayOutputStream();
         Encoder enc = new Encoder();
         enc.SetEndMarkerMode(true);
+        enc.SetDictionarySize( 1 << 20 );
         enc.WriteCoderProperties( baos );
         enc.Code( bis, baos, -1, -1, null );
         buf = baos.toByteArray();
