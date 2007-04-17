@@ -3,13 +3,12 @@ package SevenZip.streams;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
 class ConcurrentBufferOutputStream extends OutputStream
 {
-    protected ArrayBlockingQueue<Integer> q;
+    protected BlockingIntQueue q;
 
-    ConcurrentBufferOutputStream( ArrayBlockingQueue<Integer> q )
+    ConcurrentBufferOutputStream( BlockingIntQueue q )
     {
         this.q = q;
     }

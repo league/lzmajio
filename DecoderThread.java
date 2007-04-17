@@ -8,7 +8,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class DecoderThread extends Thread
 {
-    protected ArrayBlockingQueue<Integer> q;
+    protected SemaphoreIntArrayQueue q;
     protected InputStream in;
     protected OutputStream out;
     protected Decoder dec;
@@ -16,7 +16,7 @@ class DecoderThread extends Thread
 
     DecoderThread( InputStream in )
     {
-        this.q = new ArrayBlockingQueue<Integer>( 4096 );
+        this.q = new SemaphoreIntArrayQueue( );
         this.in = in;
         this.out = new ConcurrentBufferOutputStream( q );
         this.dec = new Decoder();

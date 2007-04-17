@@ -8,7 +8,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
 {
-    protected ArrayBlockingQueue<Integer> q;
+    protected SemaphoreIntArrayQueue q;
     protected InputStream in;
     protected OutputStream out;
     protected Encoder enc;
@@ -16,7 +16,7 @@ class EncoderThread extends Thread
 
     EncoderThread( OutputStream out )
     {
-        this.q = new ArrayBlockingQueue<Integer>( 4096 );
+        this.q = new SemaphoreIntArrayQueue( );
         this.in = new ConcurrentBufferInputStream( q );
         this.out = out;
         this.enc = new Encoder();
