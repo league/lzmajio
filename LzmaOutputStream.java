@@ -22,7 +22,15 @@ public class LzmaOutputStream extends FilterOutputStream
         this.out = new ConcurrentBufferOutputStream( eth.q );
         eth.start( );
     }
-    
+
+    public void write( int i ) throws IOException
+    {
+        if( eth.exn != null ) {
+            throw eth.exn;
+        }
+        out.write( i );
+    }
+        
     public void close( ) throws IOException
     {
         out.close( );

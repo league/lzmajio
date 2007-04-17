@@ -26,8 +26,7 @@ class ConcurrentBufferOutputStream extends OutputStream
 
     public void write( int i ) throws IOException
     {
-        byte b = (byte)(i & 0xff);
-        guarded_put( b );
+        guarded_put( i & 0xff );
     }
 
     public void close( ) throws IOException
