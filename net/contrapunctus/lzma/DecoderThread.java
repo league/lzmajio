@@ -1,4 +1,4 @@
-package SevenZip.streams;
+package net.contrapunctus.lzma;
 
 import SevenZip.Compression.LZMA.Decoder;
 import java.io.IOException;

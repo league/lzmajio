@@ -1,4 +1,4 @@
-package SevenZip.streams;
+package net.contrapunctus.lzma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
