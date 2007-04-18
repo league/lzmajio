@@ -1,3 +1,9 @@
+// ConcurrentBufferOutputStream.java -- write bytes to blocking queue
+// Copyright (c)2007 Christopher League <league@contrapunctus.net>
+
+// This is free software, but it comes with ABSOLUTELY NO WARRANTY.
+// GNU Lesser General Public License 2.1 or Common Public License 1.0
+
 package net.contrapunctus.lzma;
 
 import java.io.IOException;
