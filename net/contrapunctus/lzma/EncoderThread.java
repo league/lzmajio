@@ -4,6 +4,7 @@ import SevenZip.Compression.LZMA.Encoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
@@ -14,13 +15,18 @@ class EncoderThread extends Thread
     protected Encoder enc;
     protected IOException exn;
 
-    EncoderThread( OutputStream out )
+    private static final PrintStream dbg = System.err;
+    private static final boolean DEBUG =
+        System.getProperty("DEBUG_LzmaCoders") != null;
+
+    EncoderThread( OutputStream _out )
     {
-        this.q = new BlockingIntQueue( );
-        this.in = new ConcurrentBufferInputStream( q );
-        this.out = out;
-        this.enc = new Encoder();
-        this.exn = null;
+        q = new BlockingIntQueue( );
+        in = new ConcurrentBufferInputStream( q );
+        out = _out;
+        enc = new Encoder();
+        exn = null;
+        if(DEBUG) dbg.printf("%s << %s (%s)%n", this, in, q);
     }
 
     public void run( )
@@ -30,11 +36,19 @@ class EncoderThread extends Thread
             enc.SetDictionarySize( 1 << 20 );
             // enc.WriteCoderProperties( out );
             // 5d 00 00 10 00
+            if(DEBUG) dbg.printf("%s begins%n", this);
             enc.Code( in, out, -1, -1, null );
+            if(DEBUG) dbg.printf("%s ends%n", this);
             out.close( );
         }
-        catch( IOException exn ) {
-            this.exn = exn;
+        catch( IOException _exn ) {
+            exn = _exn;
+            if(DEBUG) dbg.printf("%s exception: %s%n", exn.getMessage());
         }
+    }
+
+    public String toString( )
+    {
+        return String.format("Enc@%x", hashCode());
     }
 }

@@ -10,16 +10,20 @@ import java.io.PrintStream;
 import SevenZip.Compression.LZMA.Encoder;
 import java.io.ByteArrayInputStream;
 
-
 public class LzmaOutputStream extends FilterOutputStream
 {
     protected EncoderThread eth;
 
-    public LzmaOutputStream( OutputStream out ) 
+    private static final PrintStream dbg = System.err;
+    private static final boolean DEBUG =
+        System.getProperty("DEBUG_LzmaStreams") != null;
+
+    public LzmaOutputStream( OutputStream _out ) 
     {
         super( null );
-        this.eth = new EncoderThread( out );
-        this.out = new ConcurrentBufferOutputStream( eth.q );
+        eth = new EncoderThread( _out );
+        out = new ConcurrentBufferOutputStream( eth.q );
+        if(DEBUG) dbg.printf("%s >> %s (%s)%n", this, out, eth.q);
         eth.start( );
     }
 
@@ -33,9 +37,11 @@ public class LzmaOutputStream extends FilterOutputStream
         
     public void close( ) throws IOException
     {
+        if(DEBUG) dbg.printf("%s closed%n", this);
         out.close( );
         try {
             eth.join( );
+            if(DEBUG) dbg.printf("%s joined %s%n", this, eth);
         }
         catch( InterruptedException exn ) {
             throw new InterruptedIOException( exn.getMessage() );
@@ -43,6 +49,11 @@ public class LzmaOutputStream extends FilterOutputStream
         if( eth.exn != null ) {
             throw eth.exn;
         }
+    }
+
+    public String toString( )
+    {
+        return String.format("lzmaOut@%x", hashCode());
     }
 
     public static void main( String[] args ) throws IOException

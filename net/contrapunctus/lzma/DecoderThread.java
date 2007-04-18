@@ -4,6 +4,7 @@ import SevenZip.Compression.LZMA.Decoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 class DecoderThread extends Thread
@@ -14,13 +15,18 @@ class DecoderThread extends Thread
     protected Decoder dec;
     protected IOException exn;
 
-    DecoderThread( InputStream in )
+    private static final PrintStream dbg = System.err;
+    private static final boolean DEBUG =
+        System.getProperty("DEBUG_LzmaCoders") != null;
+
+    DecoderThread( InputStream _in )
     {
-        this.q = new BlockingIntQueue( );
-        this.in = in;
-        this.out = new ConcurrentBufferOutputStream( q );
-        this.dec = new Decoder();
-        this.exn = null;
+        q = new BlockingIntQueue( );
+        in = _in;
+        out = new ConcurrentBufferOutputStream( q );
+        dec = new Decoder();
+        exn = null;
+        if(DEBUG) dbg.printf("%s >> %s (%s)%n", this, out, q);
     }
 
     static final int propSize = 5;
@@ -41,11 +47,20 @@ class DecoderThread extends Thread
         try {
             // int n = in.read( props, 0, propSize );
             dec.SetDecoderProperties( props );
+            if(DEBUG) dbg.printf("%s begins%n", this);
             dec.Code( in, out, -1 );
-            in.close( );
+            if(DEBUG) dbg.printf("%s ends%n", this);
+            in.close( ); //?
+            out.close( );
         }
-        catch( IOException exn ) {
-            this.exn = exn;
+        catch( IOException _exn ) {
+            exn = _exn;
+            if(DEBUG) dbg.printf("%s exception: %s%n", exn.getMessage());
         }
+    }
+
+    public String toString( )
+    {
+        return String.format("Dec@%x", hashCode());
     }
 }

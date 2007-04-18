@@ -8,12 +8,28 @@ public class LzmaInputStream extends FilterInputStream
 {
     protected DecoderThread dth;
 
-    public LzmaInputStream( InputStream in )
+    private static final PrintStream dbg = System.err;
+    private static final boolean DEBUG =
+        System.getProperty("DEBUG_LzmaStreams") != null;
+
+    public LzmaInputStream( InputStream _in )
     {
         super( null );
-        this.dth = new DecoderThread( in );
-        this.in = new ConcurrentBufferInputStream( dth.q );
+        dth = new DecoderThread( _in );
+        in = new ConcurrentBufferInputStream( dth.q );
+        if(DEBUG) dbg.printf("%s << %s (%s)%n", this, in, dth.q);
         dth.start( );
+    }
+
+    public void close( ) throws IOException
+    {
+        if(DEBUG) dbg.printf("%s closed%n", this);
+        super.close( );
+    }
+
+    public String toString( )
+    {
+        return String.format("lzmaIn@%x", hashCode());
     }
 
     public static void main( String[] args ) throws IOException
