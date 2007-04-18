@@ -4,8 +4,8 @@ LZMA_JIO_MINOR = 7
 LZMA_JIO_VERSION = $(LZMA_JIO_MAJOR).$(LZMA_JIO_MINOR)
 
 JAR = jar
-JAR_FILE = lzma-$(LZMA_SDK_VERSION)-jiostream-$(LZMA_JIO_VERSION).jar
-DIST_FILE = lzma-jiostream-$(LZMA_JIO_VERSION)
+JAR_FILE = lzma-$(LZMA_SDK_VERSION)-jio-$(LZMA_JIO_VERSION).jar
+DIST_FILE = lzmajio-$(LZMA_JIO_VERSION)
 AUX_FILES = Version.java
 
 default:
