@@ -34,7 +34,7 @@ print '";';
 print <<EOF;
 public static void main( String[] args ) {
   if( args.length > 0 ) System.out.println(context);
-  else System.out.printf("lzma-jiostream-%d.%d%n", major, minor);
+  else System.out.printf("lzmajio-%d.%d%n", major, minor);
   }
 }
 EOF
