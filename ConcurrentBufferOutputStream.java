@@ -16,8 +16,14 @@ class ConcurrentBufferOutputStream extends OutputStream
     protected BlockingIntQueue q;
     
     private static final PrintStream dbg = System.err;
-    private static final boolean DEBUG =
-        System.getProperty("DEBUG_ConcurrentBuffer") != null;
+    private static final boolean DEBUG;
+
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_ConcurrentBuffer"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+    }
 
     ConcurrentBufferOutputStream( BlockingIntQueue q )
     {

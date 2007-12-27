@@ -21,9 +21,15 @@ final class BlockingIntQueue
     private Semaphore data;
 
     private static final PrintStream dbg = System.err;
-    private static final boolean DEBUG = 
-        System.getProperty("DEBUG_BlockingIntQueue") != null;
-    
+    private static final boolean DEBUG;
+
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_BlockingIntQueue"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+    }
+
     BlockingIntQueue( int size )
     {
         array = new int [size];

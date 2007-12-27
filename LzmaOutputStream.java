@@ -21,8 +21,14 @@ public class LzmaOutputStream extends FilterOutputStream
     protected EncoderThread eth;
 
     private static final PrintStream dbg = System.err;
-    private static final boolean DEBUG =
-        System.getProperty("DEBUG_LzmaStreams") != null;
+    private static final boolean DEBUG;
+
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_LzmaStreams"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+    }
 
     public LzmaOutputStream( OutputStream _out ) 
     {

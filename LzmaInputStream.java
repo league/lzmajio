@@ -15,8 +15,14 @@ public class LzmaInputStream extends FilterInputStream
     protected DecoderThread dth;
 
     private static final PrintStream dbg = System.err;
-    private static final boolean DEBUG =
-        System.getProperty("DEBUG_LzmaStreams") != null;
+    private static final boolean DEBUG;
+
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_LzmaStreams"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+    }
 
     public LzmaInputStream( InputStream _in )
     {

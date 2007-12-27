@@ -22,8 +22,14 @@ class EncoderThread extends Thread
     protected IOException exn;
 
     private static final PrintStream dbg = System.err;
-    private static final boolean DEBUG =
-        System.getProperty("DEBUG_LzmaCoders") != null;
+    private static final boolean DEBUG;
+
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_LzmaCoders"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+    }
 
     EncoderThread( OutputStream _out )
     {
