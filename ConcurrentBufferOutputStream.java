@@ -17,6 +17,7 @@ class ConcurrentBufferOutputStream extends OutputStream
 {
     protected ArrayBlockingQueue<byte[]> q;
     static final int BUFSIZE = 16384;
+    static final int QUEUESIZE = 4096;
     private static final PrintStream dbg = System.err;
     private static final boolean DEBUG;
 
@@ -38,6 +39,11 @@ class ConcurrentBufferOutputStream extends OutputStream
         OutputStream out = new ConcurrentBufferOutputStream( q );
         out = new BufferedOutputStream( out, BUFSIZE );
         return out;
+    }
+
+    static ArrayBlockingQueue<byte[]> newQueue( )
+    {
+        return new ArrayBlockingQueue<byte[]>( QUEUESIZE );
     }
 
     protected void guarded_put( byte[] a ) throws IOException

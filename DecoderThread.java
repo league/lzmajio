@@ -33,7 +33,7 @@ class DecoderThread extends Thread
 
     DecoderThread( InputStream _in )
     {
-        q = new ArrayBlockingQueue<byte[]>( 4096 );
+        q = ConcurrentBufferOutputStream.newQueue( );
         in = _in;
         out = ConcurrentBufferOutputStream.create( q );
         dec = new Decoder();

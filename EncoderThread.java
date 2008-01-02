@@ -33,7 +33,7 @@ class EncoderThread extends Thread
 
     EncoderThread( OutputStream _out )
     {
-        q = new ArrayBlockingQueue<byte[]> ( 4096 );
+        q = ConcurrentBufferOutputStream.newQueue();
         in = ConcurrentBufferInputStream.create( q );
         out = _out;
         enc = new Encoder();
