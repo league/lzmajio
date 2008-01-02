@@ -6,15 +6,17 @@
 
 package net.contrapunctus.lzma;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.ArrayBlockingQueue;
 
 class ConcurrentBufferOutputStream extends OutputStream
 {
-    protected BlockingIntQueue q;
-    
+    protected ArrayBlockingQueue<byte[]> q;
+    static final int BUFSIZE = 16384;
     private static final PrintStream dbg = System.err;
     private static final boolean DEBUG;
 
@@ -25,16 +27,23 @@ class ConcurrentBufferOutputStream extends OutputStream
         DEBUG = ds != null;
     }
 
-    ConcurrentBufferOutputStream( BlockingIntQueue q )
+    ConcurrentBufferOutputStream( ArrayBlockingQueue<byte[]> q )
     {
         if(DEBUG) dbg.printf("%s >> %s%n", this, q);
         this.q = q;
     }
 
-    protected void guarded_put( int i ) throws IOException
+    static OutputStream create( ArrayBlockingQueue<byte[]> q )
+    {
+        OutputStream out = new ConcurrentBufferOutputStream( q );
+        out = new BufferedOutputStream( out, BUFSIZE );
+        return out;
+    }
+
+    protected void guarded_put( byte[] a ) throws IOException
     {
         try {
-            q.put( i );
+            q.put( a );
         }
         catch( InterruptedException exn ) {
             throw new InterruptedIOException( exn.getMessage() );
@@ -43,13 +52,23 @@ class ConcurrentBufferOutputStream extends OutputStream
 
     public void write( int i ) throws IOException
     {
-        guarded_put( i & 0xff );
+        byte b[] = new byte[1];
+        b[0] = (byte) (i & 0xff);
+        guarded_put( b );
+    }
+
+    public void write(byte[] b, int off, int len) throws IOException
+    {
+        byte[] a = new byte [len];
+        System.arraycopy(b, off, a, 0, len);
+        guarded_put( a );
     }
 
     public void close( ) throws IOException
     {
         if(DEBUG) dbg.printf("%s closed%n", this);
-        guarded_put( -1 );
+        byte b[] = new byte[0]; // sentinel
+        guarded_put( b );
     }
 
     public String toString( )

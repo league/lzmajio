@@ -6,15 +6,19 @@
 
 package net.contrapunctus.lzma;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.PrintStream;
+import java.util.concurrent.ArrayBlockingQueue;
 
 class ConcurrentBufferInputStream extends InputStream
 {
-    protected BlockingIntQueue q;
-    protected boolean eof;
+    protected ArrayBlockingQueue<byte[]> q;
+    protected byte[] buf = null;
+    protected int next = 0;
+    protected boolean eof = false;
 
     private static final PrintStream dbg = System.err;
     private static final boolean DEBUG;
@@ -26,28 +30,61 @@ class ConcurrentBufferInputStream extends InputStream
         DEBUG = ds != null;
     }
 
-    ConcurrentBufferInputStream( BlockingIntQueue q )
+    ConcurrentBufferInputStream( ArrayBlockingQueue<byte[]> q )
     {
         if(DEBUG) dbg.printf("%s << %s%n", this, q);
         this.q = q;
         this.eof = false;
     }
 
-    public int read( ) throws IOException
+    static InputStream create( ArrayBlockingQueue<byte[]> q )
     {
-        if( eof ) return -1;
+        InputStream in = new ConcurrentBufferInputStream( q );
+        return in;
+    }
+
+    protected byte[] guarded_take( ) throws IOException
+    {
         try {
-            int i = q.take( );
-            if( i == -1 ) {
-                if(DEBUG) dbg.printf("%s got EOF%n", this);
-                eof = true;   
-            }
-            else i &= 0xFF;
-            return i;
+            return q.take( );
         }
         catch( InterruptedException exn ) {
             throw new InterruptedIOException( exn.getMessage() );
         }
+    }
+
+    protected boolean prepareAndCheckEOF( ) throws IOException
+    {
+        if( eof ) return true;
+        if( buf == null || next >= buf.length )
+            {
+                buf = guarded_take( );
+                next = 0;
+                if( buf.length == 0 )
+                    {
+                        eof = true;
+                        return true;
+                    }
+            }
+        return false;
+    }
+
+    public int read( ) throws IOException
+    {
+        if( prepareAndCheckEOF() ) { return -1; }
+        int x = buf[next];
+        next++;
+        return x & 0xff;
+    }
+
+    public int read( byte[] b, int off, int len ) throws IOException
+    {
+        if( prepareAndCheckEOF() ) { return -1; }
+        int k = buf.length - next;
+        if( len < k ) { k = len; }
+        System.arraycopy( buf, next, b, off, k );
+        next += k;
+        return k;
     }
 
     public String toString( )

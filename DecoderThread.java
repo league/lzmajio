@@ -15,7 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class DecoderThread extends Thread
 {
-    protected BlockingIntQueue q;
+    protected ArrayBlockingQueue<byte[]> q;
     protected InputStream in;
     protected OutputStream out;
     protected Decoder dec;
@@ -33,9 +33,9 @@ class DecoderThread extends Thread
 
     DecoderThread( InputStream _in )
     {
-        q = new BlockingIntQueue( );
+        q = new ArrayBlockingQueue<byte[]>( 4096 );
         in = _in;
-        out = new ConcurrentBufferOutputStream( q );
+        out = ConcurrentBufferOutputStream.create( q );
         dec = new Decoder();
         exn = null;
         if(DEBUG) dbg.printf("%s >> %s (%s)%n", this, out, q);

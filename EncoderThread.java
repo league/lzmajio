@@ -15,7 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
 {
-    protected BlockingIntQueue q;
+    protected ArrayBlockingQueue<byte[]> q;
     protected InputStream in;
     protected OutputStream out;
     protected Encoder enc;
@@ -33,8 +33,8 @@ class EncoderThread extends Thread
 
     EncoderThread( OutputStream _out )
     {
-        q = new BlockingIntQueue( );
-        in = new ConcurrentBufferInputStream( q );
+        q = new ArrayBlockingQueue<byte[]> ( 4096 );
+        in = ConcurrentBufferInputStream.create( q );
         out = _out;
         enc = new Encoder();
         exn = null;

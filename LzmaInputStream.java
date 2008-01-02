@@ -28,7 +28,7 @@ public class LzmaInputStream extends FilterInputStream
     {
         super( null );
         dth = new DecoderThread( _in );
-        in = new ConcurrentBufferInputStream( dth.q );
+        in = ConcurrentBufferInputStream.create( dth.q );
         if(DEBUG) dbg.printf("%s << %s (%s)%n", this, in, dth.q);
         dth.start( );
     }

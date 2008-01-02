@@ -34,7 +34,7 @@ public class LzmaOutputStream extends FilterOutputStream
     {
         super( null );
         eth = new EncoderThread( _out );
-        out = new ConcurrentBufferOutputStream( eth.q );
+        out = ConcurrentBufferOutputStream.create( eth.q );
         if(DEBUG) dbg.printf("%s >> %s (%s)%n", this, out, eth.q);
         eth.start( );
     }
