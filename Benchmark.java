@@ -16,7 +16,7 @@ import java.util.zip.Checksum;
 public class Benchmark
 {
     private static byte[][] data = null;
-    private static final Random rnd = new Random();
+    private static final Random rnd = new Random( 0xCAFEBABE );
     private static final Checksum ck = new Adler32();
     private static final int EXPONENT = 18;
     private static final int ITERATIONS = 512;
