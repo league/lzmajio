@@ -32,8 +32,13 @@ public class LzmaOutputStream extends FilterOutputStream
 
     public LzmaOutputStream( OutputStream _out ) 
     {
+        this(_out, EncoderThread.DEFAULT_DICT_SZ_POW2, null);
+    }
+
+    public LzmaOutputStream( OutputStream _out, Integer dictSzPow2, Integer fastBytes )
+    {
         super( null );
-        eth = new EncoderThread( _out );
+        eth = new EncoderThread( _out, dictSzPow2, fastBytes );
         out = ConcurrentBufferOutputStream.create( eth.q );
         if(DEBUG) dbg.printf("%s >> %s (%s)%n", this, out, eth.q);
         eth.start( );

@@ -15,6 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
 {
+    public static final Integer DEFAULT_DICT_SZ_POW2 = new Integer(1<<20);
     protected ArrayBlockingQueue<byte[]> q;
     protected InputStream in;
     protected OutputStream out;
@@ -33,11 +34,23 @@ class EncoderThread extends Thread
 
     EncoderThread( OutputStream _out )
     {
+        this(_out, DEFAULT_DICT_SZ_POW2, null);
+    }
+
+    /**
+     * @param dictSzPow2 If non-null, equivalent to the N in the -dN arg to LzmaAlone
+     * @param fastBytes  If non-null, equivalent to the N in the -fbN arg to LzmaAlone
+     */
+    EncoderThread( OutputStream _out, Integer dictSzPow2, Integer fastBytes)
+    {
         q = ConcurrentBufferOutputStream.newQueue();
         in = ConcurrentBufferInputStream.create( q );
         out = _out;
         enc = new Encoder();
         exn = null;
+        enc.SetDictionarySize(1 << (dictSzPow2 == null ? DEFAULT_DICT_SZ_POW2 : dictSzPow2).intValue());
+        if (fastBytes != null)
+            enc.SeNumFastBytes(fastBytes.intValue());
         if(DEBUG) dbg.printf("%s << %s (%s)%n", this, in, q);
     }
 
@@ -45,7 +58,6 @@ class EncoderThread extends Thread
     {
         try {
             enc.SetEndMarkerMode( true );
-            enc.SetDictionarySize( 1 << 20 );
             // enc.WriteCoderProperties( out );
             // 5d 00 00 10 00
             if(DEBUG) dbg.printf("%s begins%n", this);

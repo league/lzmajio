@@ -1,6 +1,6 @@
 LZMA_SDK_VERSION = 4.57
 LZMA_JIO_MAJOR = 0
-LZMA_JIO_MINOR = 9
+LZMA_JIO_MINOR = 92
 LZMA_JIO_VERSION = $(LZMA_JIO_MAJOR).$(LZMA_JIO_MINOR)
 
 JAR = jar
@@ -15,7 +15,7 @@ all: build $(AUX_FILES)
 	javac -d build $(shell find SevenZip -name '*.java') *.java
 
 build:
-	mkdir build
+	-mkdir build
 
 jar: $(JAR_FILE)
 
