@@ -50,7 +50,7 @@ class EncoderThread extends Thread
         exn = null;
         enc.SetDictionarySize(1 << (dictSzPow2 == null ? DEFAULT_DICT_SZ_POW2 : dictSzPow2).intValue());
         if (fastBytes != null)
-            enc.SeNumFastBytes(fastBytes.intValue());
+            enc.SetNumFastBytes(fastBytes.intValue());
         if(DEBUG) dbg.printf("%s << %s (%s)%n", this, in, q);
     }
 
