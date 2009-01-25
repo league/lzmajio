@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lzmajio" default="jar" basedir=".">
+	<target name="init">
+		<mkdir dir="build"/>
+		<mkdir dir="docs"/>
+	</target>
+	<target name="compile" depends="init">
+		<javac srcdir="." destdir="build" classpath="${gentoo.classpath}"/>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar jarfile="lzmajio.jar" basedir="build"/>
+	</target>
+
+	<target name="javadoc" depends="init">
+		<javadoc destdir="docs" classpath="${gentoo.classpath}">
+			<fileset dir=".">
+				<include name="**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
+</project>
