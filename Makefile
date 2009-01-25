@@ -1,18 +1,19 @@
 LZMA_SDK_VERSION = 4.63
 LZMA_JIO_MAJOR = 0
-LZMA_JIO_MINOR = 93
+LZMA_JIO_MINOR = 94
 LZMA_JIO_VERSION = $(LZMA_JIO_MAJOR).$(LZMA_JIO_MINOR)
 
 JAR = jar
 JAR_FILE = lzma-$(LZMA_SDK_VERSION)-jio-$(LZMA_JIO_VERSION).jar
 DIST_NAME = lzmajio-$(LZMA_JIO_VERSION)
 DIST_FILE = $(DIST_NAME).tar.gz
-AUX_FILES = Version.java
+PACKAGE = net/contrapunctus/lzma
+AUX_FILES = $(PACKAGE)/Version.java
 
 default:
 
 all: build $(AUX_FILES)
-	javac -d build $(shell find SevenZip -name '*.java') *.java
+	javac -d build $(shell find SevenZip -name '*.java') $(PACKAGE)/*.java
 
 build:
 	-mkdir build
@@ -22,7 +23,7 @@ jar: $(JAR_FILE)
 $(JAR_FILE): all
 	$(JAR) cf $@ CPL.html LGPL.txt -C build .
 
-Version.java: Version.pl
+$(PACKAGE)/Version.java: Version.pl
 	darcs changes $(REPODIR) --context \
 	  | perl $< $(LZMA_JIO_MAJOR) $(LZMA_JIO_MINOR) >$@
 
