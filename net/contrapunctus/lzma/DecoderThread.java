@@ -57,10 +57,26 @@ class DecoderThread extends Thread
     public void run( )
     { 
         try {
-            // int n = in.read( props, 0, propSize );
-            dec.SetDecoderProperties( props );
+            long outSize = 0;
+            if( LzmaOutputStream.LZMA_HEADER ) {
+                int n = in.read( props, 0, propSize );
+                if( n != propSize )
+                    throw new IOException("input .lzma file is too short");
+                dec.SetDecoderProperties( props );
+                for (int i = 0; i < 8; i++)
+                    {
+                        int v = in.read();
+                        if (v < 0)
+                            throw new IOException("Can't read stream size");
+                        outSize |= ((long)v) << (8 * i);
+                    }
+            }
+            else {
+                outSize = -1;
+                dec.SetDecoderProperties( props );
+            }
             if(DEBUG) dbg.printf("%s begins%n", this);
-            dec.Code( in, out, -1 );
+            dec.Code( in, out, outSize );
             if(DEBUG) dbg.printf("%s ends%n", this);
             in.close( ); //?
             out.close( );

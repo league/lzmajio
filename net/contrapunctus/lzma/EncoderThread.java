@@ -58,8 +58,13 @@ class EncoderThread extends Thread
     {
         try {
             enc.SetEndMarkerMode( true );
-            // enc.WriteCoderProperties( out );
-            // 5d 00 00 10 00
+            if( LzmaOutputStream.LZMA_HEADER ) {
+                enc.WriteCoderProperties( out );
+                // 5d 00 00 10 00
+                long fileSize = -1;
+                for (int i = 0; i < 8; i++)
+                    out.write((int)(fileSize >>> (8 * i)) & 0xFF);
+            }
             if(DEBUG) dbg.printf("%s begins%n", this);
             enc.Code( in, out, -1, -1, null );
             if(DEBUG) dbg.printf("%s ends%n", this);

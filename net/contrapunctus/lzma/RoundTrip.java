@@ -10,7 +10,7 @@ import java.io.*;
 
 public class RoundTrip
 {
-    public static void main( String[] args ) throws IOException
+    public static void doit( ) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         LzmaOutputStream lo = new LzmaOutputStream( baos );
@@ -33,5 +33,13 @@ public class RoundTrip
         System.out.println( s );
         System.out.println( k );
         assert s.equals( k );
+    }
+
+    public static void main( String[] args ) throws IOException
+    {
+        LzmaOutputStream.LZMA_HEADER = true;
+        doit();
+        LzmaOutputStream.LZMA_HEADER = false;
+        doit();
     }
 }

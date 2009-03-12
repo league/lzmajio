@@ -20,6 +20,11 @@ public class LzmaOutputStream extends FilterOutputStream
 {
     protected EncoderThread eth;
 
+    public static boolean LZMA_HEADER = true;
+    /* true for compatibility with lzma(1) command-line tool, false
+     * for compatibility with previous versions of LZMA streams.
+     */
+
     private static final PrintStream dbg = System.err;
     private static final boolean DEBUG;
 
