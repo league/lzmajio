@@ -8,20 +8,6 @@ package net.contrapunctus.lzma;
 
 import java.io.*;
 
-// Expected performance:
-//
-// % java -cp lzmajio.jar net.contrapunctus.lzma.LzmaCompat file.7za t
-// LZMA_HEADER = true
-// writing file.7za
-// % lzma -dc file.7za
-// Hello, world!
-//
-// % java -cp lzmajio.jar net.contrapunctus.lzma.LzmaCompat file.7za
-// LZMA_HEADER = false
-// writing file.7za
-// % lzma -dc file.7za
-// ===ERROR===
-
 public class LzmaCompat
 {
     public static void writeFile( String name ) throws IOException
