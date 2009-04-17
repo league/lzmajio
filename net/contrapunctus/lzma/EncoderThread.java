@@ -15,7 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
 {
-    public static final Integer DEFAULT_DICT_SZ_POW2 = new Integer(1<<20);
+    public static final Integer DEFAULT_DICT_SZ_POW2 = new Integer(20);
     protected ArrayBlockingQueue<byte[]> q;
     protected InputStream in;
     protected OutputStream out;
