@@ -1,0 +1,13 @@
+package net.contrapunctus.lzma;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+public class Version {
+public static final int major = @major@;
+public static final int minor = @minor@;
+public static final String context = "@context@";
+public static void main( String[] args ) {
+  if( args.length > 0 ) System.out.println(context);
+  else System.out.printf("lzmajio-%d.%d%n", major, minor);
+  }
+}

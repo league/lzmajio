@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="lzmajio" default="jar" basedir=".">
+
+	<property name="major" value="0" />
+	<property name="minor" value="95" />
+
+	<target name="context">
+		<exec executable="git" outputproperty="context">
+			<arg value="describe" />
+		</exec>
+	</target>
+
+	<target name="version-stamp" depends="context">
+		<filter token="major" value="${major}" />
+		<filter token="minor" value="${minor}" />
+		<filter token="context" value="${context}" />
+		<copy file="net/contrapunctus/lzma/Version.template"
+					tofile="net/contrapunctus/lzma/Version.java"
+					filtering="on"
+					overwrite="true" />
+	</target>
+
 	<target name="init">
 		<mkdir dir="build"/>
 		<mkdir dir="docs"/>
@@ -20,3 +40,7 @@
 		</javadoc>
 	</target>
 </project>
+<!-- Local variables: -->
+<!-- indent-tabs-mode: t -->
+<!-- tab-width: 2 -->
+<!-- End: -->
