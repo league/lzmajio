@@ -1,43 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="lzmajio" default="jar" basedir=".">
 
+	<path id="test-path">
+		<pathelement location="build" />
+		<pathelement location="/usr/share/junit/junit.jar" />
+		<pathelement path="${java.class.path}" />
+		<pathelement path="${gentoo.classpath}" />
+	</path>
+
 	<property name="major" value="0" />
 	<property name="minor" value="95" />
+	<property name="version" value="${major}.${minor}" />
+	<property name="package" value="net/contrapunctus/lzma" />
+	<property name="jarfile" value="lzmajio.jar" />
 
-	<target name="context">
+	<available file="${package}/Version.java" property="version-stamp-exists" />
+
+	<target name="version-stamp" unless="version-stamp-exists">
 		<exec executable="git" outputproperty="context">
 			<arg value="describe" />
 		</exec>
-	</target>
-
-	<target name="version-stamp" depends="context">
 		<filter token="major" value="${major}" />
 		<filter token="minor" value="${minor}" />
 		<filter token="context" value="${context}" />
-		<copy file="net/contrapunctus/lzma/Version.template"
-					tofile="net/contrapunctus/lzma/Version.java"
-					filtering="on"
-					overwrite="true" />
+		<copy file="${package}/Version.template"
+					tofile="${package}/Version.java"
+					filtering="on" />
 	</target>
 
 	<target name="init">
 		<mkdir dir="build"/>
 		<mkdir dir="docs"/>
 	</target>
-	<target name="compile" depends="init">
-		<javac srcdir="." destdir="build" classpath="${gentoo.classpath}"/>
+
+	<target name="compile" depends="init,version-stamp">
+		<javac srcdir="." destdir="build">
+			<classpath>
+				<path refid="test-path" />
+			</classpath>
+		</javac>
 	</target>
 
 	<target name="jar" depends="compile">
-		<jar jarfile="lzmajio.jar" basedir="build"/>
+		<copy file="CPL.html" todir="build" />
+		<copy file="LGPL.txt" todir="build" />
+		<jar jarfile="${jarfile}" basedir="build"/>
 	</target>
 
-	<target name="javadoc" depends="init">
+	<target name="javadoc" depends="init,version-stamp">
 		<javadoc destdir="docs" classpath="${gentoo.classpath}">
 			<fileset dir=".">
 				<include name="**/*.java"/>
 			</fileset>
 		</javadoc>
+	</target>
+
+	<target name="dist" depends="clean,version-stamp">
+    <tar destfile="lzmajio-${version}.tar.gz" compression="gzip">
+			<tarfileset dir="." prefix="lzmajio-${version}">
+				<exclude name="lzmajio*.gz" />
+				<exclude name="lzmajio*.jar" />
+				<exclude name="lzmajio*.tar" />
+				<exclude name=".git/**" />
+				<exclude name="SevenZip/**" />
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="test" depends="compile">
+		<junit printsummary="yes" showoutput="yes" haltonfailure="yes">
+			<classpath>
+				<path refid="test-path" />
+			</classpath>
+			<batchtest>
+				<fileset dir=".">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="docs" />
+	</target>
+
+	<target name="distclean" depends="clean">
+		<delete file="${jarfile}" />
+		<delete file="${package}/Version.java" />
+		<delete>
+			<fileset dir="." includes="lzmajio*.gz" />
+			<fileset dir="." includes="lzmajio*.jar" />
+			<fileset dir="." includes="lzmajio*.tar" />
+		</delete>
 	</target>
 </project>
 <!-- Local variables: -->
