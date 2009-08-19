@@ -14,7 +14,9 @@
 	<property name="package" value="net/contrapunctus/lzma" />
 	<property name="jarfile" value="lzmajio.jar" />
 
-	<available file="${package}/Version.java" property="version-stamp-exists" />
+	<uptodate srcfile="${package}/Version.template"
+						targetfile="${package}/Version.java"
+						property="version-stamp-exists" />
 
 	<target name="version-stamp" unless="version-stamp-exists">
 		<exec executable="git" outputproperty="context">
