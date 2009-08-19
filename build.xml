@@ -48,7 +48,10 @@
 	</target>
 
 	<target name="javadoc" depends="init,version-stamp">
-		<javadoc destdir="docs" classpath="${gentoo.classpath}">
+		<javadoc destdir="docs">
+			<classpath>
+				<path refid="test-path" />
+			</classpath>
 			<fileset dir=".">
 				<include name="**/*.java"/>
 			</fileset>
