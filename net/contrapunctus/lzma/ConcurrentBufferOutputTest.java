@@ -7,6 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.zip.CRC32;
 import org.junit.Test;
 import org.junit.Assert;
+import static net.contrapunctus.lzma.ConcurrentBufferOutputStream.*;
 
 /**
  * Some tests to exercise the ConcurrentBufferOutputStream. One test
@@ -22,8 +23,8 @@ public class ConcurrentBufferOutputTest
         withSeed(seed);
     }
 
-    static final int MAX_BUFFER = ConcurrentBufferOutputStream.BUFSIZE * 2;
-    static final int MAX_ITERS = ConcurrentBufferOutputStream.QUEUESIZE * 2;
+    static final int MAX_BUFFER = BUFSIZE * 2;
+    static final int MAX_ITERS = QUEUESIZE * 2;
     private static final boolean DEBUG;
 
     static {
@@ -33,7 +34,7 @@ public class ConcurrentBufferOutputTest
         DEBUG = ds != null;
     }
 
-    abstract class Summer extends Thread
+    static abstract class Summer extends Thread
     {
         protected CRC32 sum = new CRC32();
         Exception exn;
@@ -172,9 +173,8 @@ public class ConcurrentBufferOutputTest
 
     private void testReadWrite(Writer wr) throws InterruptedException
     {
-        ArrayBlockingQueue<byte[]> q =
-            ConcurrentBufferOutputStream.newQueue();
-        OutputStream os = ConcurrentBufferOutputStream.create(q);
+        ArrayBlockingQueue<byte[]> q = newQueue();
+        OutputStream os = create(q);
         wr.init(os);
         wr.start();
         Reader rd = new Reader(q);

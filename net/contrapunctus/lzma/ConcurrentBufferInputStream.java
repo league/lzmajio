@@ -30,7 +30,7 @@ class ConcurrentBufferInputStream extends InputStream
         DEBUG = ds != null;
     }
 
-    ConcurrentBufferInputStream( ArrayBlockingQueue<byte[]> q )
+    private ConcurrentBufferInputStream( ArrayBlockingQueue<byte[]> q )
     {
         if(DEBUG) dbg.printf("%s << %s%n", this, q);
         this.q = q;
