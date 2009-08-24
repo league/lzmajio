@@ -28,7 +28,7 @@ class ConcurrentBufferOutputStream extends OutputStream
         DEBUG = ds != null;
     }
 
-    ConcurrentBufferOutputStream( ArrayBlockingQueue<byte[]> q )
+    private ConcurrentBufferOutputStream( ArrayBlockingQueue<byte[]> q )
     {
         if(DEBUG) dbg.printf("%s >> %s%n", this, q);
         this.q = q;
