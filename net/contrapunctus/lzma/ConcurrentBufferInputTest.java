@@ -156,7 +156,7 @@ public class ConcurrentBufferInputTest
 
         boolean read() throws IOException
         {
-            byte[] bs = new byte[rng.nextInt(MAX_BUFFER)+1];
+            byte[] bs = new byte[rng.nextInt(MAX_BUFFER)+2];
             int n;
             switch(rng.nextInt(4))
                 {
