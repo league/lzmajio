@@ -1,22 +1,72 @@
 package net.contrapunctus.lzma;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 import static net.contrapunctus.lzma.ConcurrentBufferInputStream.create;
 import static net.contrapunctus.lzma.ConcurrentBufferOutputStream.newQueue;
 import static net.contrapunctus.lzma.ConcurrentBufferOutputTest.*;
 
+@RunWith(Parameterized.class)
 public class ConcurrentBufferInputTest
 {
-    @Test public void withRandomSeed() throws InterruptedException
+    @Parameters public static Collection<Object[]> parameters()
+        throws IOException
     {
-        long seed = System.currentTimeMillis();
-        System.out.println("seed " + seed);
-        withSeed(seed);
+        Collection<Object[]> args = new ArrayList<Object[]>();
+        args.add(new Object[] { System.currentTimeMillis(), true });
+        args.add(new Object[] { System.currentTimeMillis(), false });
+        // get the rest of the seeds from text file
+        FileInputStream fis = new FileInputStream("tests/input-seeds.txt");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+        String s = br.readLine();
+        while(s != null)
+            {
+                args.add(new Object[] { Long.parseLong(s), false });
+                s = br.readLine();
+            }
+        return args;
+    }
+
+    public static void main(String[] args) throws InterruptedException
+    {
+        new ConcurrentBufferInputTest(Long.parseLong(args[0]),
+                                      Boolean.parseBoolean(args[1])).run();
+    }
+
+    boolean boundary;
+    long seed;
+
+    public ConcurrentBufferInputTest(long seed, boolean boundary)
+    {
+        this.seed = seed;
+        this.boundary = boundary;
+    }
+
+    @Test(timeout=5000) public void run() throws InterruptedException
+    {
+        System.out.printf("boundary %s seed %dL\n", boundary, seed);
+        Random rng = new Random(seed);
+        if(boundary)
+            {
+                testReadWrite(rng, new BoundaryWriter());
+            }
+        else
+            {
+                Random rng2 = new Random(rng.nextLong());
+                testReadWrite(rng, new RandomWriter(rng2));
+            }
     }
 
     abstract class Writer extends Summer
@@ -161,20 +211,5 @@ public class ConcurrentBufferInputTest
         Assert.assertNull(rd.exn);
         System.out.printf("sums %x -> %x\n", wr.getSum(), rd.getSum());
         Assert.assertEquals(wr.getSum(), rd.getSum());
-    }
-
-    private void withSeed(long seed) throws InterruptedException
-    {
-        Random rng1 = new Random(seed);
-        Random rng2 = new Random(rng1.nextLong());
-        testReadWrite(rng1, new RandomWriter(rng2));
-    }
-
-    @Test public void boundaryTest() throws InterruptedException
-    {
-        long seed = System.currentTimeMillis();
-        System.out.println("seed " + seed);
-        Random rng = new Random(seed);
-        testReadWrite(rng, new BoundaryWriter());
     }
 }
