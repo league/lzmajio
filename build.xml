@@ -13,6 +13,7 @@
 	<property name="version" value="${major}.${minor}" />
 	<property name="package" value="net/contrapunctus/lzma" />
 	<property name="jarfile" value="lzmajio.jar" />
+	<property name="debug" value="no" />
 
 	<uptodate srcfile="${package}/Version.template"
 						targetfile="${package}/Version.java"
@@ -36,7 +37,7 @@
 	</target>
 
 	<target name="compile" depends="init,version-stamp">
-		<javac srcdir="." destdir="build">
+		<javac srcdir="." destdir="build" debug="${debug}">
 			<classpath>
 				<path refid="test-path" />
 			</classpath>
@@ -73,10 +74,13 @@
 	</target>
 
 	<target name="test" depends="compile">
-		<junit printsummary="yes" showoutput="yes" haltonfailure="yes">
+		<echo>Base dir is ${basedir}</echo>
+		<junit printsummary="yes" showoutput="yes" haltonfailure="yes"
+					 fork="yes" dir="${basedir}">
 			<classpath>
 				<path refid="test-path" />
 			</classpath>
+			<formatter type="plain"/>
 			<batchtest>
 				<fileset dir=".">
 					<include name="**/*Test.java" />
@@ -88,6 +92,9 @@
 	<target name="clean">
 		<delete dir="build" />
 		<delete dir="docs" />
+		<delete>
+			<fileset dir="." includes="TEST-*.txt" />
+		</delete>
 	</target>
 
 	<target name="distclean" depends="clean">
