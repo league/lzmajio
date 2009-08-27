@@ -32,31 +32,76 @@ public class RoundTripTest
         Collection<Object[]> args = new ArrayList<Object[]>();
         for(File f : fs)
             {
-                args.add(new Object[] { f });
+                args.add(new Object[] { f, false });
+                args.add(new Object[] { f, true });
             }
         return args;
     }
 
+    String name;
     byte[] original;
+    boolean header;
 
-    public RoundTripTest(File f0) throws IOException
+    private static final boolean DEBUG;
+    private static final String sample;
+    static {
+        String ds = null;
+        try { ds = System.getProperty("DEBUG_RoundTrip"); }
+        catch(SecurityException e) { }
+        DEBUG = ds != null;
+
+        String s = null;
+        try {
+            s = System.getProperty("RoundTripText"); 
+        }
+        catch(SecurityException e) { }
+        if(s != null) sample = s;
+        else sample = "Yes yes yes test test test.";
+    }
+
+    public RoundTripTest(File file, boolean header) throws IOException
     {
-        RandomAccessFile f = new RandomAccessFile(f0, "r");
-        long len = f.length();
-        assert len < Integer.MAX_VALUE;
-        original = new byte[(int)len];
-        f.readFully(original);
+        this.header = header;
+        if(file != null)
+            {
+                this.name = file.getName();
+                RandomAccessFile f = new RandomAccessFile(file, "r");
+                long len = f.length();
+                assert len < Integer.MAX_VALUE; // huge files will fail, because
+                original = new byte[(int)len];  // we read whole thing into mem
+                f.readFully(original);
+            }
+        else
+            {
+                this.name = "-";
+                this.original = sample.getBytes();
+            }
+    }
+
+    public String toString()
+    {
+        return name + '[' + (header? '+':'-') + ']';
     }
 
     @Test public void run() throws IOException
     {
+        System.out.printf("%s:", this);
+        LzmaOutputStream.LZMA_HEADER = header;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         LzmaOutputStream los = new LzmaOutputStream( baos );
         los.write(original);
         los.close();
         byte[] compressed = baos.toByteArray();
-        System.out.printf("original %d, compressed %d\n",
+        System.out.printf(" original %d, compressed %d\n",
                           original.length, compressed.length);
+        if(DEBUG)
+            {
+                for(int i = 0;  i < compressed.length;  i++)
+                    {
+                        System.out.printf("%02x ", compressed[i]);
+                    }
+                System.out.println();
+            }
         // and back again
         ByteArrayInputStream bais = new ByteArrayInputStream(compressed);
         LzmaInputStream lis = new LzmaInputStream(bais);
@@ -66,36 +111,20 @@ public class RoundTripTest
         Assert.assertTrue(Arrays.equals(original, expanded));
     }
 
-    public static void doit( ) throws IOException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        LzmaOutputStream lo = new LzmaOutputStream( baos );
-        PrintStream ps = new PrintStream( lo );
-        String k = "Yes yes yes test test test.";
-        ps.print( k );
-        ps.close( );
-        byte[] buf = baos.toByteArray();
-
-        for(int i = 0;  i < buf.length;  i++)
-            {
-                System.out.printf("%02x ", buf[i]);
-            }
-        System.out.println();
-        // and back again
-        ByteArrayInputStream bais = new ByteArrayInputStream( buf );
-        LzmaInputStream li = new LzmaInputStream( bais );
-        BufferedReader br = new BufferedReader(new InputStreamReader(li));
-        String s = br.readLine();
-        System.out.println( s );
-        System.out.println( k );
-        assert s.equals( k );
-    }
-
     public static void main( String[] args ) throws IOException
     {
-        LzmaOutputStream.LZMA_HEADER = true;
-        doit();
-        LzmaOutputStream.LZMA_HEADER = false;
-        doit();
+        if(0 == args.length)
+            {
+                new RoundTripTest(null, false).run();
+                new RoundTripTest(null, true).run();
+            }
+        else
+            {
+                for(String s : args)
+                    {
+                        new RoundTripTest(new File(s), false).run();
+                        new RoundTripTest(new File(s), true).run();
+                    }
+            }
     }
 }

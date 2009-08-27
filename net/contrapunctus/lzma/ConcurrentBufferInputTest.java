@@ -27,15 +27,7 @@ public class ConcurrentBufferInputTest
         Collection<Object[]> args = new ArrayList<Object[]>();
         args.add(new Object[] { System.currentTimeMillis(), true });
         args.add(new Object[] { System.currentTimeMillis(), false });
-        // get the rest of the seeds from text file
-        FileInputStream fis = new FileInputStream("tests/input-seeds.txt");
-        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-        String s = br.readLine();
-        while(s != null)
-            {
-                args.add(new Object[] { Long.parseLong(s), false });
-                s = br.readLine();
-            }
+        args.add(new Object[] { 1251234417455L, false });
         return args;
     }
 
@@ -54,9 +46,15 @@ public class ConcurrentBufferInputTest
         this.boundary = boundary;
     }
 
+    public String toString()
+    {
+        return (boundary? "boundary" : "random") +
+            " seed " + seed + 'L';
+    }
+
     @Test(timeout=5000) public void run() throws InterruptedException
     {
-        System.out.printf("boundary %s seed %dL\n", boundary, seed);
+        System.out.printf("%s: ", this);
         Random rng = new Random(seed);
         if(boundary)
             {

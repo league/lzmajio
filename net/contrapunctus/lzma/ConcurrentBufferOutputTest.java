@@ -2,11 +2,16 @@ package net.contrapunctus.lzma;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.zip.CRC32;
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 import static net.contrapunctus.lzma.ConcurrentBufferOutputStream.*;
 
 /**
@@ -14,13 +19,44 @@ import static net.contrapunctus.lzma.ConcurrentBufferOutputStream.*;
  * is randomized, but the seed is printed, so that results should be
  * reproducible if needed.
  */
+@RunWith(Parameterized.class)
 public class ConcurrentBufferOutputTest
 {
-    @Test public void withRandomSeed() throws Exception
+    @Parameters public static Collection<Object[]> parameters()
     {
-        long seed = System.currentTimeMillis();
-        System.out.println("seed " + seed);
-        withSeed(seed);
+        Collection<Object[]> args = new ArrayList<Object[]>();
+        args.add(new Object[] { 0L });
+        args.add(new Object[] { System.currentTimeMillis() });
+        args.add(new Object[] { 1251302491693L });
+        return args;
+    }
+
+    public static void main(String[] args)
+        throws InterruptedException
+    {
+        new ConcurrentBufferOutputTest(Long.parseLong(args[0]));
+    }
+
+    private long seed;
+    private Writer wr;
+
+    public ConcurrentBufferOutputTest(long seed)
+    {
+        this.seed = seed;
+        this.wr = (0L == seed)? new BoundaryWriter() :
+            new RandomWriter(new Random(seed));
+    }
+
+    public String toString()
+    {
+        return "seed " + seed + "L";
+    }
+
+    @Test(timeout=5000) public void run()
+        throws InterruptedException
+    {
+        System.out.printf("%s:", this);
+        testReadWrite(wr);
     }
 
     static final int MAX_BUFFER = BUFSIZE * 2;
@@ -182,17 +218,7 @@ public class ConcurrentBufferOutputTest
         wr.join();
         Assert.assertNull(wr.exn);
         Assert.assertNull(rd.exn);
-        System.out.printf("sums %x -> %x\n", wr.getSum(), rd.getSum());
+        System.out.printf(" sums %x -> %x\n", wr.getSum(), rd.getSum());
         Assert.assertEquals(wr.getSum(), rd.getSum());
-    }
-
-    private void withSeed(long seed) throws InterruptedException
-    {
-        testReadWrite(new RandomWriter(new Random(seed)));
-    }
-
-    @Test public void boundaryTest() throws InterruptedException
-    {
-        testReadWrite(new BoundaryWriter());
     }
 }
