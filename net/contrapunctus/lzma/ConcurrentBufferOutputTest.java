@@ -34,7 +34,7 @@ public class ConcurrentBufferOutputTest
     public static void main(String[] args)
         throws InterruptedException
     {
-        new ConcurrentBufferOutputTest(Long.parseLong(args[0]));
+        new ConcurrentBufferOutputTest(Long.parseLong(args[0])).run();
     }
 
     private long seed;
@@ -91,6 +91,8 @@ public class ConcurrentBufferOutputTest
                 }
             catch(Exception exn)
                 {
+                    System.out.println(exn);
+                    exn.printStackTrace();
                     this.exn = exn;
                 }
         }
@@ -157,7 +159,7 @@ public class ConcurrentBufferOutputTest
 
         void write() throws IOException
         {
-            byte[] bs = new byte[rng.nextInt(MAX_BUFFER)+1];
+            byte[] bs = new byte[rng.nextInt(MAX_BUFFER)+2];
             rng.nextBytes(bs);
             switch(rng.nextInt(4))
                 {
