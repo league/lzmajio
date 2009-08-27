@@ -1,4 +1,4 @@
-// RoundTrip.java -- a simple test program for LZMA in/out streams
+// RoundTripTest.java -- a simple test program for LZMA in/out streams
 // Copyright (c)2007 Christopher League <league@contrapunctus.net>
 
 // This is free software, but it comes with ABSOLUTELY NO WARRANTY.
@@ -7,9 +7,59 @@
 package net.contrapunctus.lzma;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 
-public class RoundTrip
+@RunWith(Parameterized.class)
+public class RoundTripTest
 {
+    @Parameters public static Collection<Object[]> files()
+    {
+        File dir = new File("tests/roundtrip");
+        File[] fs = dir.listFiles();
+        Collection<Object[]> args = new ArrayList<Object[]>();
+        for(File f : fs)
+            {
+                args.add(new Object[] { f });
+            }
+        return args;
+    }
+
+    byte[] original;
+
+    public RoundTripTest(File f0) throws IOException
+    {
+        RandomAccessFile f = new RandomAccessFile(f0, "r");
+        long len = f.length();
+        assert len < Integer.MAX_VALUE;
+        original = new byte[(int)len];
+        f.readFully(original);
+    }
+
+    @Test public void run() throws IOException
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        LzmaOutputStream los = new LzmaOutputStream( baos );
+        los.write(original);
+        los.close();
+        byte[] compressed = baos.toByteArray();
+        System.out.printf("original %d, compressed %d\n",
+                          original.length, compressed.length);
+        // and back again
+        ByteArrayInputStream bais = new ByteArrayInputStream(compressed);
+        LzmaInputStream lis = new LzmaInputStream(bais);
+        DataInputStream dis = new DataInputStream(lis);
+        byte[] expanded = new byte[original.length];
+        dis.readFully(expanded);
+        Assert.assertTrue(Arrays.equals(original, expanded));
+    }
+
     public static void doit( ) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
