@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class RoundTripTest
@@ -70,6 +71,7 @@ public class RoundTripTest
                 assert len < Integer.MAX_VALUE; // huge files will fail, because
                 original = new byte[(int)len];  // we read whole thing into mem
                 f.readFully(original);
+                f.close();
             }
         else
             {
@@ -109,6 +111,49 @@ public class RoundTripTest
         byte[] expanded = new byte[original.length];
         dis.readFully(expanded);
         Assert.assertTrue(Arrays.equals(original, expanded));
+    }
+
+    @Test public void withLzmaCommand()
+        throws IOException, InterruptedException
+    {
+        // header is required for compatibility with lzma(1)
+        if(!header) return;
+        LzmaOutputStream.LZMA_HEADER = header;
+        System.out.printf("%s: ", this);
+
+        // write compressed data to temp file
+        File lzfile = File.createTempFile("roundtrip", ".lzma");
+        FileOutputStream fos = new FileOutputStream(lzfile);
+        LzmaOutputStream los = new LzmaOutputStream(fos);
+        los.write(original);
+        los.close();
+
+        // ask lzma(1) to decompress it
+        System.out.printf("unlzma %s\n", lzfile.getName());
+        Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec("unlzma " + lzfile);
+        int r = p.waitFor();
+        assertEquals(r, 0);
+
+        // chop off .lzma extension
+        String path = lzfile.getPath();
+        assertTrue(path.endsWith(".lzma"));
+        int k = path.lastIndexOf('.');
+        File plain = new File(path.substring(0, k));
+        assertTrue(plain.exists());
+
+        // read contents and verify
+        RandomAccessFile raf = new RandomAccessFile(plain, "r");
+        long len = raf.length();
+        assert len < Integer.MAX_VALUE;
+        byte[] copy = new byte[(int)len];
+        raf.readFully(copy);
+        raf.close();
+        assertTrue(Arrays.equals(original, copy));
+
+        // clean up
+        lzfile.delete();
+        plain.delete();
     }
 
     public static void main( String[] args ) throws IOException
