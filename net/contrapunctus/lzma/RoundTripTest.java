@@ -36,29 +36,15 @@ public class RoundTripTest
                 args.add(new Object[] { f, false });
                 args.add(new Object[] { f, true });
             }
+        args.add(new Object[] { null, false });
+        args.add(new Object[] { null, true });
         return args;
     }
 
     String name;
     byte[] original;
     boolean header;
-
-    private static final boolean DEBUG;
-    private static final String sample;
-    static {
-        String ds = null;
-        try { ds = System.getProperty("DEBUG_RoundTrip"); }
-        catch(SecurityException e) { }
-        DEBUG = ds != null;
-
-        String s = null;
-        try {
-            s = System.getProperty("RoundTripText"); 
-        }
-        catch(SecurityException e) { }
-        if(s != null) sample = s;
-        else sample = "Yes yes yes test test test.";
-    }
+    boolean DEBUG;
 
     public RoundTripTest(File file, boolean header) throws IOException
     {
@@ -75,8 +61,15 @@ public class RoundTripTest
             }
         else
             {
+                String s = null;
+                try {
+                    s = System.getProperty("RoundTripText"); 
+                }
+                catch(SecurityException e) { }
+                if(s == null) s = "Yes yes yes test test test.";
                 this.name = "-";
-                this.original = sample.getBytes();
+                this.original = s.getBytes();
+                this.DEBUG = true;
             }
     }
 

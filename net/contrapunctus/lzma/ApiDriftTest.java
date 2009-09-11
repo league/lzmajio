@@ -2,6 +2,7 @@ package net.contrapunctus.lzma;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.junit.Test;
@@ -48,5 +49,11 @@ public class ApiDriftTest
         LzmaInputStream lis;
         lis = new LzmaInputStream(new ByteArrayInputStream(new byte[0]));
         assertTrue(lis instanceof InputStream);
+    }
+
+    @Test public void entryPoints() throws IOException
+    {
+        RoundTripTest.main(new String[0]);
+        RoundTripTest.main(new String[] {"build.xml"});
     }
 }

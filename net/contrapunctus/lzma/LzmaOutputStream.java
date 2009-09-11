@@ -77,45 +77,4 @@ public class LzmaOutputStream extends FilterOutputStream
     {
         return String.format("lzmaOut@%x", hashCode());
     }
-
-    public static void main( String[] args ) throws IOException
-    {
-        String s1 = "Hello hello hello, world!";
-        String s2 = "This is the best test.";        
-        OutputStream os = new OutputStream() {
-                public void write(int i)
-                {
-                    System.out.printf("%02x ", i);
-                }
-            };
-        
-        LzmaOutputStream zo = new LzmaOutputStream( os );
-        PrintStream ps = new PrintStream( zo );
-        ps.print(s1);
-        ps.print(s2);        
-        ps.close( );
-        System.out.println();
-        //////////////////
-        System.out.println("TRADITIONAL WAY:");
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ps = new PrintStream( baos );
-        ps.print(s1);
-        ps.print(s2);
-        ps.close();
-        byte[] buf = baos.toByteArray();
-        ByteArrayInputStream bis = new ByteArrayInputStream( buf );
-        baos = new ByteArrayOutputStream();
-        Encoder enc = new Encoder();
-        enc.SetEndMarkerMode(true);
-        enc.SetDictionarySize( 1 << 20 );
-        enc.WriteCoderProperties( baos );
-        enc.Code( bis, baos, -1, -1, null );
-        buf = baos.toByteArray();
-        for( int i = 0;  i < buf.length;  i++ )
-            {
-                System.out.printf("%02x ", buf[i]);
-            }
-        System.out.println();
-    }
 }
