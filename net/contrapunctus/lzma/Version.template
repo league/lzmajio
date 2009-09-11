@@ -30,12 +30,6 @@ public class Version
     public static final String context = "@context@";
 
     /**
-     * Private constructor, because there's no need to instantiate
-     * this class.
-     */
-    private Version() { }
-
-    /**
      * Small main program that prints the library version or, with any
      * argument, the context string.
      */

@@ -108,7 +108,7 @@
 		</junit>
 	</target>
 
-	<target name="coverage">
+	<target name="coverage" depends="test">
 		<cobertura-report srcdir="." destdir="${build.coverage.dir}" />
 	</target>
 
