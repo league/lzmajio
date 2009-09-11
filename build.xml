@@ -4,6 +4,12 @@
 	<path id="test-path">
 		<pathelement location="build" />
 		<pathelement location="/usr/share/junit/junit.jar" />
+		<pathelement location="/opt/local/share/java/cobertura.jar" />
+		<pathelement location="/opt/local/share/java/jakarta-log4j.jar" />
+		<pathelement location="/opt/local/share/java/jakarta-oro.jar" />
+		<pathelement location="/opt/local/share/java/javancss.jar" />
+		<pathelement location="/opt/local/share/java/objectweb-asm.jar" />
+		<pathelement location="/opt/local/share/java/ccl.jar" />
 		<pathelement path="${java.class.path}" />
 		<pathelement path="${gentoo.classpath}" />
 	</path>
@@ -14,6 +20,13 @@
 	<property name="package" value="net/contrapunctus/lzma" />
 	<property name="jarfile" value="lzmajio.jar" />
 	<property name="debug" value="no" />
+	<property name="build.coverage.dir" value="ibuild" />
+
+	<taskdef resource="tasks.properties">
+		<classpath>
+			<path refid="test-path" />
+		</classpath>
+	</taskdef>
 
 	<uptodate srcfile="${package}/Version.template"
 						targetfile="${package}/Version.java"
@@ -75,9 +88,15 @@
 
 	<target name="test" depends="compile">
 		<echo>Base dir is ${basedir}</echo>
+		<cobertura-instrument todir="${build.coverage.dir}">
+			<fileset dir="build">
+				<include name="**/*.class" />
+			</fileset>
+		</cobertura-instrument>
 		<junit printsummary="yes" showoutput="yes" haltonfailure="yes"
 					 fork="yes" dir="${basedir}">
 			<classpath>
+				<pathelement location="${build.coverage.dir}" />
 				<path refid="test-path" />
 			</classpath>
 			<formatter type="plain"/>
@@ -89,9 +108,15 @@
 		</junit>
 	</target>
 
+	<target name="coverage">
+		<cobertura-report srcdir="." destdir="${build.coverage.dir}" />
+	</target>
+
 	<target name="clean">
 		<delete dir="build" />
 		<delete dir="docs" />
+		<delete dir="${build.coverage.dir}" />
+		<delete file="cobertura.ser" />
 		<delete>
 			<fileset dir="." includes="TEST-*.txt" />
 		</delete>
