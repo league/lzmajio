@@ -32,11 +32,6 @@ class EncoderThread extends Thread
         DEBUG = ds != null;
     }
 
-    EncoderThread( OutputStream _out )
-    {
-        this(_out, DEFAULT_DICT_SZ_POW2, null);
-    }
-
     /**
      * @param dictSzPow2 If non-null, equivalent to the N in the -dN arg to LzmaAlone
      * @param fastBytes  If non-null, equivalent to the N in the -fbN arg to LzmaAlone
