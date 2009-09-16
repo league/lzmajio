@@ -76,9 +76,4 @@ class ConcurrentBufferOutputStream extends OutputStream
         byte b[] = new byte[0]; // sentinel
         guarded_put( b );
     }
-
-    public String toString( )
-    {
-        return String.format("cbOut@%x", hashCode());
-    }
 }

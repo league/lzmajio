@@ -79,11 +79,23 @@ class DecoderThread extends Thread
             dec.Code( in, out, outSize );
             if(DEBUG) dbg.printf("%s ends%n", this);
             in.close( ); //?
-            out.close( );
         }
         catch( IOException _exn ) {
             exn = _exn;
-            if(DEBUG) dbg.printf("%s exception: %s%n", exn.getMessage());
+            if(DEBUG) dbg.printf("%s exception: %s%n", this, exn.getMessage());
+        }
+        // close either way, so listener can unblock
+        try {
+            out.close( );
+        }
+        catch( IOException _exn ) {
+        }
+    }
+
+    public void maybeThrow() throws IOException
+    {
+        if(exn != null) {
+            throw exn;
         }
     }
 

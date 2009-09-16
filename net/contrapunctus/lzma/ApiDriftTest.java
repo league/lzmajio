@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -55,5 +56,29 @@ public class ApiDriftTest
     {
         RoundTripTest.main(new String[0]);
         RoundTripTest.main(new String[] {"build.xml"});
+    }
+
+    @Test public void strings()
+    {
+        ArrayBlockingQueue<byte[]> q =
+            ConcurrentBufferOutputStream.newQueue();
+        // ConcurrentBufferInputStream
+        InputStream is = ConcurrentBufferInputStream.create(q);
+        System.out.println(is);
+        // ConcurrentBufferOutputStream
+        OutputStream os = ConcurrentBufferOutputStream.create(q);
+        System.out.println(os);
+        // DecoderThread
+        Thread th = new DecoderThread(is);
+        System.out.println(th);
+        // EncoderThread
+        th = new EncoderThread(os, 0, 0);
+        System.out.println(th);
+        // LzmaInputStream
+        is = new LzmaInputStream(is);
+        System.out.println(is);
+        // LzmaOutputStream
+        os = new LzmaOutputStream(os);
+        System.out.println(os);
     }
 }

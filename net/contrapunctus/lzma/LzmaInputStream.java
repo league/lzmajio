@@ -33,6 +33,20 @@ public class LzmaInputStream extends FilterInputStream
         dth.start( );
     }
 
+    public int read() throws IOException
+    {
+        int k = in.read();
+        dth.maybeThrow();
+        return k;
+    }
+
+    public int read(byte[] b, int off, int len) throws IOException
+    {
+        int k = in.read(b, off, len);
+        dth.maybeThrow();
+        return k;
+    }
+
     public void close( ) throws IOException
     {
         if(DEBUG) dbg.printf("%s closed%n", this);
