@@ -93,6 +93,41 @@ class ConcurrentBuffer
         return result;
     }
 
+    public synchronized int read() throws InterruptedException
+    {
+        while(0 == count) {
+            if(eof) return -1;
+            if(DEBUG) dbg.printf("%s wait to read one%n", this);
+            wait();
+        }
+        if(DEBUG) dbg.printf("%s read one -> ", this);
+        int x = buf[out];
+        out = (out + 1) % buf.length;
+        count--;
+        if(DEBUG) dbg.println(this);
+        notify();
+        return x & 0xff;
+    }
+
+    public synchronized int read(byte[] dst, int off, int len)
+        throws InterruptedException
+    {
+        while(0 == count) {
+            if(eof) return -1;
+            if(DEBUG) dbg.printf("%s wait to read %d%n", this, len);
+            wait();
+        }
+        int num_contiguous = min(count, buf.length - out);
+        int num_to_copy = min(num_contiguous, len);
+        if(DEBUG) dbg.printf("%s read %d -> ", this, num_to_copy);
+        System.arraycopy(buf, out, dst, off, num_to_copy);
+        out = (out + num_to_copy) % buf.length;
+        count -= num_to_copy;
+        if(DEBUG) dbg.println(this);
+        notify();
+        return num_to_copy;
+    }
+
     private int min(int x, int y)
     {
         if(x < y) return x;

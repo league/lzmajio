@@ -42,48 +42,24 @@ class ConcurrentBufferInputStream extends InputStream
         return in;
     }
 
-    protected byte[] guarded_take( ) throws IOException
+    public int read( ) throws IOException
     {
         try {
-            return q.take( );
+            return q.read();
         }
         catch( InterruptedException exn ) {
             throw new InterruptedIOException( exn.getMessage() );
         }
     }
 
-    protected boolean prepareAndCheckEOF( ) throws IOException
-    {
-        if( eof ) return true;
-        if( buf == null || next >= buf.length )
-            {
-                buf = guarded_take( );
-                next = 0;
-                if( buf.length == 0 )
-                    {
-                        eof = true;
-                        return true;
-                    }
-            }
-        return false;
-    }
-
-    public int read( ) throws IOException
-    {
-        if( prepareAndCheckEOF() ) { return -1; }
-        int x = buf[next];
-        next++;
-        return x & 0xff;
-    }
-
     public int read( byte[] b, int off, int len ) throws IOException
     {
-        if( prepareAndCheckEOF() ) { return -1; }
-        int k = buf.length - next;
-        if( len < k ) { k = len; }
-        System.arraycopy( buf, next, b, off, k );
-        next += k;
-        return k;
+        try {
+            return q.read(b, off, len);
+        }
+        catch( InterruptedException exn ) {
+            throw new InterruptedIOException( exn.getMessage() );
+        }
     }
 
     public String toString( )
