@@ -78,9 +78,7 @@ public class ConcurrentBufferInputTest
 
         void write(int i) throws InterruptedException
         {
-            byte b[] = new byte[1];
-            b[0] = (byte) i;
-            q.put(b);
+            q.put((byte) i);
             sum.update(i);
         }
 
@@ -101,7 +99,7 @@ public class ConcurrentBufferInputTest
                     write(i);
                 }
             write(42);          // one more byte
-            write(new byte[0]); // sentinel
+            q.setEOF();
         }
     }
 
@@ -135,8 +133,7 @@ public class ConcurrentBufferInputTest
                     if(rng.nextBoolean()) yield();
                     write();
                 }
-            // write sentinel
-            q.put(new byte[0]);
+            q.setEOF();
         }
     }
 

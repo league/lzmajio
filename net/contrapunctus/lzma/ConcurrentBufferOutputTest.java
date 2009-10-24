@@ -197,13 +197,14 @@ public class ConcurrentBufferOutputTest
 
         protected void checkedRun() throws InterruptedException
         {
-            byte[] bs = q.take();
-            while(bs.length > 0)
+            byte[] bs = new byte[MAX_BUFFER];
+            int k = q.read(bs, 0, bs.length);
+            while(k > 0)
                 {
                     if(DEBUG) System.out.println("read "+ bs.length+ " bytes");
-                    sum.update(bs, 0, bs.length);
-                    if(bs.length%11==0) Thread.yield();
-                    bs = q.take();
+                    sum.update(bs, 0, k);
+                    if(k%11==0) Thread.yield();
+                    k = q.read(bs, 0, bs.length);
                 }
         }
     }

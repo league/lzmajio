@@ -68,12 +68,6 @@ class ConcurrentBufferOutputStream extends OutputStream
     public void close( ) throws IOException
     {
         if(DEBUG) dbg.printf("%s closed%n", this);
-        byte b[] = new byte[0]; // sentinel
-        try {
-            q.put(b);
-        }
-        catch( InterruptedException exn ) {
-            throw new InterruptedIOException( exn.getMessage() );
-        }
+        q.setEOF();
     }
 }

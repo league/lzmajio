@@ -33,17 +33,15 @@ class ConcurrentBuffer
         notify();
     }
 
-    public synchronized void put(byte[] src)
-        throws InterruptedException
+    public synchronized void setEOF()
     {
-        // special case: 0-length array means EOF
-        if(0 == src.length) {
-            eof = true;
-            notify();
-        }
-        else {
-            put(src, 0, src.length);
-        }
+        eof = true;
+        notify();
+    }
+
+    public void put(byte[] src) throws InterruptedException
+    {
+        put(src, 0, src.length);
     }
 
     public void put(byte[] src, int off, int len)
@@ -73,24 +71,6 @@ class ConcurrentBuffer
         if(DEBUG) dbg.println(this);
         notify();
         return num_to_copy;
-    }
-
-    public synchronized byte[] take() throws InterruptedException
-    {
-        while(0 == count) {
-            if(eof) return new byte[0]; // sentinel
-            if(DEBUG) dbg.printf("%s wait to take%n", this);
-            wait();
-        }
-        int num_contiguous = min(count, buf.length - out);
-        if(DEBUG) dbg.printf("%s take %d -> ", this, num_contiguous);
-        byte[] result = new byte[num_contiguous];
-        System.arraycopy(buf, out, result, 0, num_contiguous);
-        out = (out + num_contiguous) % buf.length;
-        count -= num_contiguous;
-        if(DEBUG) dbg.println(this);
-        notify();
-        return result;
     }
 
     public synchronized int read() throws InterruptedException
