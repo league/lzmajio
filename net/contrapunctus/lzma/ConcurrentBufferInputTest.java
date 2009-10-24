@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,9 +68,9 @@ public class ConcurrentBufferInputTest
 
     abstract class Writer extends Summer
     {
-        protected ArrayBlockingQueue<byte[]> q;
+        protected ConcurrentBuffer q;
 
-        Writer init(ArrayBlockingQueue<byte[]> q)
+        Writer init(ConcurrentBuffer q)
         {
             this.q = q;
             return this;
@@ -198,7 +197,7 @@ public class ConcurrentBufferInputTest
 
     private void testReadWrite(Random rng, Writer wr) throws InterruptedException
     {
-        ArrayBlockingQueue<byte[]> q = newQueue();
+        ConcurrentBuffer q = newQueue();
         InputStream is = create(q);
         wr.init(q);
         wr.start();

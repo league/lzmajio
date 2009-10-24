@@ -11,12 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
 class EncoderThread extends Thread
 {
     public static final Integer DEFAULT_DICT_SZ_POW2 = new Integer(20);
-    protected ArrayBlockingQueue<byte[]> q;
+    protected ConcurrentBuffer q;
     protected InputStream in;
     protected OutputStream out;
     protected Encoder enc;

@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
 class ConcurrentBufferOutputStream extends OutputStream
 {
-    protected ArrayBlockingQueue<byte[]> q;
+    protected ConcurrentBuffer q;
     static final int BUFSIZE = 16384;
     static final int QUEUESIZE = 4096;
     private static final PrintStream dbg = System.err;
@@ -28,22 +27,22 @@ class ConcurrentBufferOutputStream extends OutputStream
         DEBUG = ds != null;
     }
 
-    private ConcurrentBufferOutputStream( ArrayBlockingQueue<byte[]> q )
+    private ConcurrentBufferOutputStream( ConcurrentBuffer q )
     {
         if(DEBUG) dbg.printf("%s >> %s%n", this, q);
         this.q = q;
     }
 
-    static OutputStream create( ArrayBlockingQueue<byte[]> q )
+    static OutputStream create( ConcurrentBuffer q )
     {
         OutputStream out = new ConcurrentBufferOutputStream( q );
         out = new BufferedOutputStream( out, BUFSIZE );
         return out;
     }
 
-    static ArrayBlockingQueue<byte[]> newQueue( )
+    static ConcurrentBuffer newQueue( )
     {
-        return new ArrayBlockingQueue<byte[]>( QUEUESIZE );
+        return new ConcurrentBuffer ();
     }
 
     protected void guarded_put( byte[] a ) throws IOException

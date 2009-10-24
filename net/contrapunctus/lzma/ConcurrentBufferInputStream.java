@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.PrintStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
 class ConcurrentBufferInputStream extends InputStream
 {
-    protected ArrayBlockingQueue<byte[]> q;
+    protected ConcurrentBuffer q;
     protected byte[] buf = null;
     protected int next = 0;
     protected boolean eof = false;
@@ -30,14 +29,14 @@ class ConcurrentBufferInputStream extends InputStream
         DEBUG = ds != null;
     }
 
-    private ConcurrentBufferInputStream( ArrayBlockingQueue<byte[]> q )
+    private ConcurrentBufferInputStream( ConcurrentBuffer q )
     {
         if(DEBUG) dbg.printf("%s << %s%n", this, q);
         this.q = q;
         this.eof = false;
     }
 
-    static InputStream create( ArrayBlockingQueue<byte[]> q )
+    static InputStream create( ConcurrentBuffer q )
     {
         InputStream in = new ConcurrentBufferInputStream( q );
         return in;

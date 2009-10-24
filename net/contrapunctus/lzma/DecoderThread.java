@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
 class DecoderThread extends Thread
 {
-    protected ArrayBlockingQueue<byte[]> q;
+    protected ConcurrentBuffer q;
     protected InputStream in;
     protected OutputStream out;
     protected Decoder dec;

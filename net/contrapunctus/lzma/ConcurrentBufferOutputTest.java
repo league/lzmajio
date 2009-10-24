@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.zip.CRC32;
 import org.junit.Assert;
 import org.junit.Test;
@@ -189,9 +188,9 @@ public class ConcurrentBufferOutputTest
 
     class Reader extends Summer
     {
-        protected ArrayBlockingQueue<byte[]> q;
+        protected ConcurrentBuffer q;
 
-        Reader(ArrayBlockingQueue<byte[]> q)
+        Reader(ConcurrentBuffer q)
         {
             this.q = q;
         }
@@ -211,7 +210,7 @@ public class ConcurrentBufferOutputTest
 
     private void testReadWrite(Writer wr) throws InterruptedException
     {
-        ArrayBlockingQueue<byte[]> q = newQueue();
+        ConcurrentBuffer q = newQueue();
         OutputStream os = create(q);
         wr.init(os);
         wr.start();
