@@ -45,34 +45,35 @@ class ConcurrentBufferOutputStream extends OutputStream
         return new ConcurrentBuffer ();
     }
 
-    protected void guarded_put( byte[] a ) throws IOException
+    public void write( int i ) throws IOException
     {
         try {
-            q.put( a );
+            q.put((byte) (i & 0xff));
         }
         catch( InterruptedException exn ) {
             throw new InterruptedIOException( exn.getMessage() );
         }
     }
 
-    public void write( int i ) throws IOException
-    {
-        byte b[] = new byte[1];
-        b[0] = (byte) (i & 0xff);
-        guarded_put( b );
-    }
-
     public void write(byte[] b, int off, int len) throws IOException
     {
-        byte[] a = new byte [len];
-        System.arraycopy(b, off, a, 0, len);
-        guarded_put( a );
+        try {
+            q.put(b, off, len);
+        }
+        catch( InterruptedException exn ) {
+            throw new InterruptedIOException( exn.getMessage() );
+        }
     }
 
     public void close( ) throws IOException
     {
         if(DEBUG) dbg.printf("%s closed%n", this);
         byte b[] = new byte[0]; // sentinel
-        guarded_put( b );
+        try {
+            q.put(b);
+        }
+        catch( InterruptedException exn ) {
+            throw new InterruptedIOException( exn.getMessage() );
+        }
     }
 }

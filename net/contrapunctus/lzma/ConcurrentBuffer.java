@@ -18,6 +18,21 @@ class ConcurrentBuffer
         buf = new byte[BUFSIZE];
     }
 
+    public synchronized void put(byte x)
+        throws InterruptedException
+    {
+        while(count == buf.length) {
+            if(DEBUG) dbg.printf("%s wait to put one%n", this);
+            wait();
+        }
+        if(DEBUG) dbg.printf("%s put one -> ", this);
+        buf[in] = x;
+        in = (in + 1) % buf.length;
+        count++;
+        if(DEBUG) dbg.println(this);
+        notify();
+    }
+
     public synchronized void put(byte[] src)
         throws InterruptedException
     {
@@ -56,7 +71,7 @@ class ConcurrentBuffer
         in = (in + num_to_copy) % buf.length;
         count += num_to_copy;
         if(DEBUG) dbg.println(this);
-        notifyAll();
+        notify();
         return num_to_copy;
     }
 
