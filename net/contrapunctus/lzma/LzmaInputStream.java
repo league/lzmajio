@@ -33,6 +33,11 @@ public class LzmaInputStream extends FilterInputStream
         dth.start( );
     }
 
+    public int available() throws IOException
+    {
+        return in.available();
+    }
+
     public int read() throws IOException
     {
         int k = in.read();

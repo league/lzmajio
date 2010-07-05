@@ -69,6 +69,11 @@ class ConcurrentBufferInputStream extends InputStream
         return false;
     }
 
+    public int available() throws IOException
+    {
+        return eof? 0 : 1;
+    }
+
     public int read( ) throws IOException
     {
         if( prepareAndCheckEOF() ) { return -1; }
